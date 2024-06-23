@@ -1,0 +1,120 @@
+-- Enable loadstring
+local ServerScriptService = game:GetService("ServerScriptService")
+ServerScriptService.LoadStringEnabled = true
+
+-- Create a remote event
+local remoteEvent = Instance.new("RemoteEvent")
+remoteEvent.Name = "LoadStringEvent"
+remoteEvent.Parent = game.ReplicatedStorage
+
+-- Connect the remote event to the loadstring function
+remoteEvent.OnServerEvent:Connect(function(player, link)
+    -- Validate the link
+    if link then
+        -- Load the code from the link
+        local function loadStringFunction()
+            loadstring(game:HttpGetAsync(link))()
+        end
+        loadStringFunction()
+    else
+        print("Invalid link")
+    end
+end)
+
+-- Create a local script
+local localScript = Instance.new("LocalScript")
+localScript.Parent = game.Players.LocalPlayer.PlayerGui
+
+-- Create the key GUI
+local gui = Instance.new("Frame")
+gui.Name = "KeyGUI"
+gui.Size = UDim2.new(0, 200, 0, 100)
+gui.Position = UDim2.new(0, 100, 0, 100)
+gui.BackgroundColor3 = Color3.new(0, 0, 0)
+gui.BackgroundTransparency = 0.5
+gui.Parent = game.StarterGui
+
+-- Create a new button
+local button = Instance.new("TextButton")
+button.Name = "KeyButton"
+button.Size = UDim2.new(0, 100, 0, 30)
+button.Position = UDim2.new(0, 50, 0, 50)
+button.Text = "Enter Key"
+button.FontSize = 14
+button.FontColor3 = Color3.new(1, 1, 1)
+button.Parent = gui
+
+-- Create a new text label
+local label = Instance.new("TextLabel")
+label.Name = "KeyLabel"
+label.Size = UDim2.new(0, 100, 0, 30)
+label.Position = UDim2.new(0, 50, 0, 20)
+label.Text = "Enter your key:"
+label.FontSize = 14
+label.FontColor3 = Color3.new(1, 1, 1)
+label.Parent = gui
+
+-- Create a new input field
+local input = Instance.new("TextBox")
+input.Name = "KeyInput"
+input.Size = UDim2.new(0, 100, 0, 30)
+input.Position = UDim2.new(0, 50, 0, 50)
+input.FontSize = 14
+input.FontColor3 = Color3.new(1, 1, 1)
+input.Parent = gui
+
+-- Create a new function to handle the key input
+local function checkKey()
+    local key = input.Text
+    if key == "Keys202492" then
+        -- Key is valid, execute the code
+        local link = "https://pastebin.com/raw/DFjSc4sN" -- Replace with the actual link
+        remoteEvent:FireServer(link)
+    else
+        -- Key is invalid, display an error message
+        label.Text = "Invalid key"
+    end
+end
+
+-- Connect the button to the checkKey function
+button.Activated:Connect(checkKey)
+
+-- Create a local script for player speed and jump
+local player = game.Players.LocalPlayer
+local character = player.Character
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Create a new script
+local script = Instance.new("LocalScript")
+script.Parent = character
+
+-- Create a new function to handle player speed and jump
+local function handleSpeedAndJump()
+    -- Get the speed slider value
+    local speedSlider = game.StarterGui:WaitForChild("SpeedSlider")
+    local speedValue = speedSlider.Value
+
+    -- Set the player speed
+    player.Character.Humanoid.WalkSpeed = speedValue
+
+    -- Create a new function to handle jump
+    local function handleJump()
+        -- Get the jump button
+        local jumpButton = game.StarterGui:WaitForChild("JumpButton")
+
+        -- Connect the jump button to the handleJump function
+        jumpButton.Activated:Connect(function()
+            -- Make the player jump
+            humanoid.Jump()
+        end)
+    end
+
+    -- Connect the handleJump function to the handleSpeedAndJump function
+    handleJump()
+end
+
+-- Connect the handleSpeedAndJump function to the script
+script:Connect(handleSpeedAndJump)
+
+-- Start the GUI
+gui.Visible = true
